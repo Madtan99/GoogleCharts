@@ -55,18 +55,51 @@
         let maxs = [];
         let dates = [];
 
+        let min = 1000;
+        let max = -1000;
+        
+        let prevDay = -1;
+
         for (let index = 0; index < infos.list.length; index++) {
             const element = infos.list[index];
-            mins.push(element.main.temp_min);
-            maxs.push(element.main.temp_max);
-            dates.push(new Date(element.dt * 1000));
+            let newDate = new Date(element.dt * 1000);
+            if (newDate.toString().split(" ")[2] == prevDay){
+                if (element.main.temp_min < min){
+                    min = element.main.temp_min;
+                }
+                if (element.main.temp_max > max){
+                    max = element.main.temp_max;
+                }
+            }
+            else{
+                prevDay = newDate.toString().split(" ")[2];
+
+                if (max != -1000 && min != 1000){
+                    maxs.push(max);
+                    dates.push(newDate); //check
+                    mins.push(min);
+                }
+                
+
+                min = 1000;
+                max = -1000;
+                
+                if (element.main.temp_min < min){
+                    min = element.main.temp_min;
+                }
+                if (element.main.temp_max > max){
+                    max = element.main.temp_max;
+                }
+            }
+            
+            
         }
         for (let v = 0; v < mins.length; v++) {
             weathers.push([dates[v], mins[v], maxs[v]]);
         }
         weathers.unshift(['Month', 'MIN', 'MAX']);
         var options_curve = {
-            title: "Météo",
+            title: "Météo dans les 5 prochains jours",
             titleTextStyle: { fontSize: '32', color: 'green' },
             legend: { position: 'top' },
             series: { 0: { color: 'blue' }, 1: { color: 'red' } },
